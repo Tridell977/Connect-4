@@ -1,0 +1,25 @@
+#game_board {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    width: 35vh;
+    background-color: blue;
+    border: 1vh solid darkblue;
+}
+.circle {
+    background-color: white;
+    width: 4.2vh;
+    height: 4.2vh;
+    border-radius: 50%;
+    margin: .2vh;
+    border: .2vh solid darkblue;
+}
+.red {
+    background-color: red;
+}
+.yellow {
+    background-color: yellow;
+}
+.row {
+    background-color: aqua;
+}
