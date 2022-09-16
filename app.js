@@ -1,11 +1,12 @@
 const boardElem = document.getElementById('game_board')
 const game = [];
-const playerOne = "Red";
-const playerTwo = "Yellow";
+const playerOne = "red";
+const playerTwo = "yellow";
 let nameCounter = 0;
 let dropArray = [5, 5, 5, 5, 5, 5, 5]
 const submitButton = document.getElementById('nameSubmit');
 const nameEnter = document.getElementById('enterName');
+const message = document.getElementById('message');
 let currentPlayer = playerOne;
 function buildinitialGame() {
      for(let i = 0; i < 7; i++){
@@ -33,10 +34,14 @@ boardElem.addEventListener('click', colorChange)
 
 
 function colorChange(event){
-    if(event.target.className === 'circle'){
+    if(event.target.classList.contains('circle')){
         const circleIndex = event.target.id.split(',');
         const x = circleIndex[0];
         let y = dropArray[x];
+        if(y < 0){
+            message.innerText = "Column Full, please choose another";
+            return;
+        }
         dropCircle = document.getElementById(`${x},${y}`);
         if(currentPlayer === playerOne){
         dropCircle.classList.add('red');
@@ -47,7 +52,6 @@ function colorChange(event){
         }
         dropArray[x]--;
     }
-
 }
 submitButton.onclick = function(){
     const one = document.getElementById('oneName');
@@ -55,11 +59,34 @@ submitButton.onclick = function(){
     if(nameCounter === 0){
     one.innerText = nameEnter.value;
     nameEnter.value = "";
-    nameEnter.placeholder = "Player Two Name";
+    nameEnter.placeholder = "Player Name";
     nameCounter++;
     } else {
         two.innerText = nameEnter.value;
         nameEnter.value = "Enjoy the Game!"
         nameEnter.disabled = true;
+        submitButton.disabled = true;
     }
 }
+// function checkWin(circle) {
+//    // vertical check
+//     vertCount = 0
+//     testCircleIdx = circle.id.split(',');
+//     x = testCircleIdx[0];
+//     y = testCircleIdx[1];
+//     for(let i = 0; i < 4; i++){
+//          y = y + i;
+//          testCircle = document.getElementById(`${x},${y}`);
+//         if(testCircle.classList.contains('red')){
+//             vertCount++;
+//         }
+//         if(vertCount === 3){
+//             message.innerText = `${currentPlayer} wins!`
+//         }
+//     }
+   // horizontal check
+
+  // diagonal right check
+
+   // diagonal left check
+// }
