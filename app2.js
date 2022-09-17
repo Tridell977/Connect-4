@@ -1,13 +1,21 @@
+// DOM selectors
 const boardElem = document.getElementById('game_board');
 const submitButton = document.getElementById('nameSubmit');
 const nameEnter = document.getElementById('enterName');
 const message = document.getElementById('message');
 const playerOne = document.getElementById('oneName');
 const playerTwo = document.getElementById('twoName');
-let gameLive = false;
 const state = {};
+
+
 buildInitialState();
+render();
 boardElem.addEventListener("click", colorChange);
+submitButton.addEventListener('click', chooseNames)
+
+
+
+
 
 function buildInitialState(){
     state.board = [];
@@ -15,52 +23,42 @@ function buildInitialState(){
         state.board.push([]);
         for(let j = 0; j < 7; j++){
             state.board[i].push(['blank']);
-            const circleElem = document.createElement('div');
-            circleElem.classList.add('circle');
-            circleElem.id = i + ',' + j;
-            boardElem.appendChild(circleElem);
         }
 }
-    state.players = [{name: '', color: ''}, {name: '', color: ''}];
+    state.gameLive = false;
+    state.players = [{name: '', color: 'red'}, {name: '', color: 'yellow'}];
     state.currentPlayer = 0;
-    state.nameCounter = 0; 
+    state.nameCounter = 0;
+    state.namePlaceHolder = '';
+    state.namePlaceHolder2 = '';
 }
-    submitButton.onclick = function() {
-        let counter = state.nameCounter;
-        if(counter === 0){
-            state.players[counter].name = nameEnter.value;
-            nameEnter.value = "";
-            nameEnter.placeholder = "Player Name";
-            } else {
-                state.players[counter].name = nameEnter.value;
-                nameEnter.value = "Enjoy the Game!"
-                nameEnter.disabled = true;
-                submitButton.disabled = true;
-        }
-        render();
-        state.nameCounter++;
+    
+function chooseNames() {
+    let counter = state.nameCounter;
+    randomNumber = Math.floor(Math.random() * 2);
+    if(counter === 0){
+        state.namePlaceHolder += nameEnter.value;
+        nameEnter.value = "";
+        nameEnter.placeholder = "Next Player Name";
+        } else if(counter === 1){
+            state.namePlaceHolder2 += nameEnter.value;
+            nameEnter.value = "Enjoy the Game!"
+            nameEnter.disabled = true;
+            submitButton.disabled = true;
     }
-function renderPlayers() {
-    if(state.nameCounter === 1){
-        randomNumber = Math.floor(Math.random() * 2);
-        gameLive = true;
-        if(randomNumber === 0){
-            playerOne.innerText = state.players[0].name;
-            state.players[0].color = "red";
-            playerTwo.innerText = state.players[1].name;
-            state.players[1].color = "yellow";
-        } else {
-            state.currentPlayer = 1;
-            playerOne.innerText = state.players[1].name;
-            state.players[1].color = "red";
-            playerTwo.innerText = state.players[0].name;
-            state.players[0].color = "yellow";
-        }
+    if(randomNumber === 0){
+        state.players[0].name = state.namePlaceHolder;
+        state.players[1].name = state.namePlaceHolder2;
+    } else {
+        state.currentPlayer = 1;
+        state.players[0].name = state.namePlaceHolder2;
+        state.players[1].name = state.namePlaceHolder;
     }
+    render();
+    state.nameCounter++;
 }
-
 function colorChange(event) {
-    if(!gameLive){
+    if(!state.gameLive){
         alert('please enter Players');
         return;
     }
@@ -73,7 +71,6 @@ function colorChange(event) {
                 return;
             } else if(state.board[y][x] == 'blank'){
                 state.board[y][x] = state.players[turn].color;
-                console.log(state.board[y][x]);
                 if(turn === 0){
                     state.currentPlayer = 1;
                 } else {
@@ -85,9 +82,21 @@ function colorChange(event) {
         }
     }
 }
+function renderPlayers() {
+    if(state.nameCounter === 1){
+        playerOne.innerText = state.players[0].name;
+        playerTwo.innerText = state.players[1].name;
+        state.gameLive = true;
+    }
+}
 function renderBoard() {
+    boardElem.innerHTML = '';
     for(let i = 0; i < 6; i++){
         for(let j = 0; j < 7; j++){
+            const circleElem = document.createElement('div');
+            circleElem.classList.add('circle');
+            circleElem.id = i + ',' + j;
+            boardElem.appendChild(circleElem);
             const circle = document.getElementById(`${i},${j}`);
             if(state.board[i][j] !== 'blank'){
                 circle.classList.add(state.board[i][j]);
@@ -99,3 +108,6 @@ function render() {
     renderPlayers();
     renderBoard();
 }
+// function checkWin(){
+//    for
+// }
