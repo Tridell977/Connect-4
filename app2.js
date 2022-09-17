@@ -113,9 +113,12 @@ function render() {
     checkWin();
 }
 function checkWin(){
+    // calling all the functions to check if there is a win
 horizontalWin();
 verticalWin();
 diagonalLtoRWin();
+diagonalRtoLWin();
+// all functions for win
    function horizontalWin(){
     for(let i = 0; i < 6; i++){
         let matchCircles = 0;
@@ -126,9 +129,9 @@ diagonalLtoRWin();
                 matchCircles = 0;
             }
             if(matchCircles === 3){
-                console.log('you win h')
+                message.innerText = "You won!";
                 state.gameLive = false;
-                return;
+                return true;
             }
         }
     }
@@ -143,9 +146,9 @@ diagonalLtoRWin();
                     matchCircles = 0;
                 }
                 if(matchCircles === 3){
-                    console.log('you win v');
+                    message.innerText = "You won!";
                     state.gameLive = false;
-                    return;
+                    return true;
                 }
             }
         }
@@ -155,7 +158,7 @@ diagonalLtoRWin();
             let matchCircles = 0;
             let up = i;
             let down = 5;
-            counter = 6;
+            let counter = 6;
             for(let j = 0; j < i; j++){
             if(state.board[up][j] === state.board[up - 1][j + 1]){
                 matchCircles++;
@@ -164,25 +167,64 @@ diagonalLtoRWin();
                 matchCircles = 0;
             }
             if(matchCircles === 3){
-                console.log('you win dl')
+                message.innerText = "You won!";
                 state.gameLive = false;
-                return;
+                return true;
             }
             }
+            matchCircles = 0;
             for(j = 1; j < counter; j++){
                 if(state.board[down][j] === state.board[down - 1][j + 1]){
                     matchCircles++;
-                    down--;
+                } else {
+                    matchCircles = 0;
+                }
+                down--;
+                if(matchCircles === 3){
+                    message.innerText = "You won!";
+                    state.gameLive = false;
+                    return true;
+                }
+            }
+            counter--;
+        }
+    }
+    function diagonalRtoLWin() {
+        let runBottom = 5;
+        let runTop = 5;
+        for(let i = 0; i < 3; i++){
+            let matchCircles = 0;
+            let up = i;
+            let startTop = 0;
+            for(let j = 0; j < runBottom; j++){
+                if(state.board[up][j] === state.board[up + 1][j + 1]){
+                    matchCircles++;
+                } else{
+                    matchCircles = 0;
+                }
+                if(matchCircles === 3){
+                    message.innerText = "You won!";
+                    state.gameLive = false;
+                    return true;
+                }
+                up++;
+            }
+            matchCircles = 0;
+            runBottom--;
+            for(let j = 1; j <= runTop; j++){
+                if(state.board[startTop][j] === state.board[startTop + 1][j + 1]){
+                    matchCircles++;
+                    startTop++;
                 } else {
                     matchCircles = 0;
                 }
                 if(matchCircles === 3){
-                    console.log('you win dl')
+                    message.innerText = "You won!";
                     state.gameLive = false;
-                    return;
+                    return true;
                 }
             }
-            counter--;
+            runTop++;
         }
     }
 }
