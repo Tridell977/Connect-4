@@ -50,7 +50,6 @@ function chooseNames() {
         state.players[0].name = state.namePlaceHolder;
         state.players[1].name = state.namePlaceHolder2;
     } else {
-        state.currentPlayer = 1;
         state.players[0].name = state.namePlaceHolder2;
         state.players[1].name = state.namePlaceHolder;
     }
@@ -58,8 +57,12 @@ function chooseNames() {
     state.nameCounter++;
 }
 function colorChange(event) {
-    if(!state.gameLive){
+    if(!state.players[0].name){
         alert('please enter Players');
+        return;
+    }
+    if(!state.gameLive){
+        alert("please reset game");
         return;
     }
     if(event.target.classList.contains('circle')){
@@ -107,7 +110,79 @@ function renderBoard() {
 function render() {
     renderPlayers();
     renderBoard();
+    checkWin();
 }
-// function checkWin(){
-//    for
-// }
+function checkWin(){
+horizontalWin();
+verticalWin();
+diagonalLtoRWin();
+   function horizontalWin(){
+    for(let i = 0; i < 6; i++){
+        let matchCircles = 0;
+        for(let j = 0; j < 6; j++){
+            if(state.board[i][j] === state.board[i][j+1]){
+                matchCircles++;
+            } else {
+                matchCircles = 0;
+            }
+            if(matchCircles === 3){
+                console.log('you win h')
+                state.gameLive = false;
+                return;
+            }
+        }
+    }
+    }
+    function verticalWin() {
+        for(let i = 0; i < 7; i++){
+            let matchCircles = 0;
+            for(let j = 5; j > 0; j--){
+                if(state.board[j][i] === state.board[j - 1][i]){
+                    matchCircles++;
+                } else {
+                    matchCircles = 0;
+                }
+                if(matchCircles === 3){
+                    console.log('you win v');
+                    state.gameLive = false;
+                    return;
+                }
+            }
+        }
+    }
+    function diagonalLtoRWin() {
+        for(let i = 3; i < 6; i++){
+            let matchCircles = 0;
+            let up = i;
+            let down = 5;
+            counter = 6;
+            for(let j = 0; j < i; j++){
+            if(state.board[up][j] === state.board[up - 1][j + 1]){
+                matchCircles++;
+                up--;
+            } else {
+                matchCircles = 0;
+            }
+            if(matchCircles === 3){
+                console.log('you win dl')
+                state.gameLive = false;
+                return;
+            }
+            }
+            for(j = 1; j < counter; j++){
+                if(state.board[down][j] === state.board[down - 1][j + 1]){
+                    matchCircles++;
+                    down--;
+                } else {
+                    matchCircles = 0;
+                }
+                if(matchCircles === 3){
+                    console.log('you win dl')
+                    state.gameLive = false;
+                    return;
+                }
+            }
+            counter--;
+        }
+    }
+}
