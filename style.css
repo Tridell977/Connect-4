@@ -1,22 +1,64 @@
+#theGame {
+    background-color: lightgray;
+    width: 73vh;
+    padding: 2vh;
+    
+}
+h1 {
+    display: flex;
+    justify-content: center;
+}
 #game_board {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
-    width: 35vh;
+    width: 70vh;
     background-color: blue;
     border: 1vh solid darkblue;
 }
+#message {
+    font-size: 3vh;
+    margin: 0vh 0 1vh 0;
+}
 .circle {
     background-color: white;
-    width: 4.2vh;
-    height: 4.2vh;
+    width: 8.4vh;
+    height: 8.4vh;
     border-radius: 50%;
-    margin: .2vh;
-    border: .2vh solid darkblue;
+    margin: .4vh;
+    border: .4vh solid darkblue;
 }
 .red {
     background-color: red;
 }
 .yellow {
     background-color: yellow;
+}
+#oneName {
+    color: red;
+}
+#twoName {
+    color: yellow;
+}
+#inputs {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1vh;
+    
+}
+#enterName {
+    margin: .5vh;
+}
+#nameSubmit {
+    margin: .5vh;
+    background-color: ;
+}
+#resetButton {
+ margin: .5vh;
+}
+@media only screen and (max-width: 768px) {
+    main {
+        font-size: smaller;
+}
 }

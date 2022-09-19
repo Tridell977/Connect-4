@@ -9,11 +9,16 @@
     <script src="app2.js" defer></script>
 </head>
 <body>
+    <main id="theGame">
     <h1>Connect Four</h1>
-    <h3 id="playerNames">Player One(Red): <span id="oneName"></span><br> Player Two(Yellow): <span id="twoName"></span> </h3>
-    <div id="message"></div>
+    <h3 id="playerNames">Player Red: <span id="oneName"></span><br> Player Yellow: <span id="twoName"></span> </h3>
+    <div id="message">To play a computer enter player name as "computer"</div>
     <main id="game_board"></main>
+    <div id="inputs">
     <input id="enterName" placeholder="Player Name">
-    <button type="submit" id="nameSubmit">Submit</button> 
+    <button type="submit" id="nameSubmit">Submit</button>
+    <button type="reset" id="resetButton">Reset Game</button>
+    </div>
+    </main>
 </body>
 </html>

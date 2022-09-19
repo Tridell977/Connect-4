@@ -1,6 +1,7 @@
 // DOM selectors
 const boardElem = document.getElementById('game_board');
 const submitButton = document.getElementById('nameSubmit');
+const resetButton = document.querySelector('#resetButton')
 const nameEnter = document.getElementById('enterName');
 const message = document.getElementById('message');
 const playerOne = document.getElementById('oneName');
@@ -11,7 +12,13 @@ const state = {};
 buildInitialState();
 render();
 boardElem.addEventListener("click", colorChange);
-submitButton.addEventListener('click', chooseNames)
+submitButton.addEventListener('click', chooseNames);
+resetButton.addEventListener('click', resetGame);
+setInterval(function() {
+    if(state.players[state.currentPlayer].name === 'computer' && state.gameLive){
+        setTimeout(computerMoves, 1000);
+    }
+}, 5000)
 
 
 
@@ -28,69 +35,130 @@ function buildInitialState(){
     state.gameLive = false;
     state.players = [{name: '', color: 'red'}, {name: '', color: 'yellow'}];
     state.currentPlayer = 0;
+    state.numberOfMoves = 0;
+    state.draw = false;
     state.nameCounter = 0;
     state.namePlaceHolder = '';
     state.namePlaceHolder2 = '';
+    state.winner = '';
 }
     
 function chooseNames() {
+    if(!nameEnter.value){
+        message.innerText = "Please choose a valid Name";
+        return;
+    }
     let counter = state.nameCounter;
     randomNumber = Math.floor(Math.random() * 2);
     if(counter === 0){
         state.namePlaceHolder += nameEnter.value;
-        nameEnter.value = "";
-        nameEnter.placeholder = "Next Player Name";
         } else if(counter === 1){
             state.namePlaceHolder2 += nameEnter.value;
-            nameEnter.value = "Enjoy the Game!"
-            nameEnter.disabled = true;
-            submitButton.disabled = true;
-    }
-    if(randomNumber === 0){
-        state.players[0].name = state.namePlaceHolder;
-        state.players[1].name = state.namePlaceHolder2;
-    } else {
-        state.players[0].name = state.namePlaceHolder2;
-        state.players[1].name = state.namePlaceHolder;
+            state.gameLive = true;
+            if(randomNumber === 0){
+                state.players[0].name = state.namePlaceHolder;
+                state.players[1].name = state.namePlaceHolder2;
+            } else {
+                state.players[0].name = state.namePlaceHolder2;
+                state.players[1].name = state.namePlaceHolder;
+            }
     }
     render();
     state.nameCounter++;
 }
 function colorChange(event) {
     if(!state.players[0].name){
-        alert('please enter Players');
+        message.innerText = "Please Choose Player Names.";
         return;
     }
     if(!state.gameLive){
-        alert("please reset game");
+        message.innerText = "Please Reset the Game";
         return;
     }
     if(event.target.classList.contains('circle')){
-        let turn = state.currentPlayer;
         const circleIndex = event.target.id.split(',');
         const x = Number(circleIndex[1]);
-        for(let y = 5; y >= 0; y--){
-            if (y < 0){
-                return;
-            } else if(state.board[y][x] == 'blank'){
-                state.board[y][x] = state.players[turn].color;
-                if(turn === 0){
-                    state.currentPlayer = 1;
-                } else {
-                    state.currentPlayer = 0;
+        dropCircle(x);
+    }
+}
+function changeTurn(num){
+    if(num === 0){
+        state.currentPlayer = 1;
+    } else {
+        state.currentPlayer = 0;
+    }
+}
+function computerMoves(){
+    let x;
+    if(checkMoveHorizontal()){
+        x = checkMoveHorizontal();
+    } else if(checkMoveVertical()){
+        x = checkMoveVertical();
+    } else {
+    x = Math.floor(Math.random() * 7)
+    }
+    dropCircle(x);
+    function checkMoveHorizontal(){
+        for(let i = 5; i > -1 ; i--){
+            for(let j = 0; j < 6; j++){
+                const color = state.players[state.currentPlayer].color;
+                if(state.board[i][j] === color){
+                    if(state.board[i][j +1] === color){
+                        if(state.board[i][j + 2] === color){
+                            return j + 3;
+                        }
+                        return j + 2;
+                    }
+                    return j + 1;
+                } 
+    }
+}
+}
+    function checkMoveVertical() {
+        for(let i = 0; i < 6; i++){
+            for(let j = 5; j > -1; j--){
+            const color = state.players[state.currentPlayer].color;
+            if(state.board[i][j] === color){
+                if(state.board[i][j +1] === color){
+                    if(state.board[i][j + 2] === color){
+                        return j - 3;
+                    }
+                    return j - 2;
                 }
-                render();
-                return;
-            }
+                return j - 1;
+            } }
+        }
+    }
+}
+function dropCircle(column){
+    for(let y = 5; y >= 0; y--){
+        if (y < 0){
+            return;
+        } else if(state.board[y][column] == 'blank'){
+            state.board[y][column] = state.players[state.currentPlayer].color;
+            state.numberOfMoves++;
+            checkWin();
+            checkDraw();
+            changeTurn(state.currentPlayer);
+            render();
+            return;
         }
     }
 }
 function renderPlayers() {
-    if(state.nameCounter === 1){
-        playerOne.innerText = state.players[0].name;
-        playerTwo.innerText = state.players[1].name;
-        state.gameLive = true;
+    if(!state.gameLive && !state.draw){
+        nameEnter.disabled = false;
+        submitButton.disabled = false;
+        nameEnter.value = '';
+        nameEnter.placeholder = 'Player name';
+    } else {
+        message.innerText = `${state.players[state.currentPlayer].name} it's your turn!`;
+        nameEnter.value = "Enjoy the Game!";
+        nameEnter.disabled = true;
+        submitButton.disabled = true;
     }
+    playerOne.innerText = state.players[0].name;
+    playerTwo.innerText = state.players[1].name;
 }
 function renderBoard() {
     boardElem.innerHTML = '';
@@ -110,7 +178,8 @@ function renderBoard() {
 function render() {
     renderPlayers();
     renderBoard();
-    checkWin();
+    renderWin();
+    renderDraw();
 }
 function checkWin(){
     // calling all the functions to check if there is a win
@@ -129,9 +198,9 @@ diagonalRtoLWin();
                 matchCircles = 0;
             }
             if(matchCircles === 3){
-                message.innerText = "You won!";
                 state.gameLive = false;
-                return true;
+                state.winner = state.board[i][j];
+                return;
             }
         }
     }
@@ -146,9 +215,9 @@ diagonalRtoLWin();
                     matchCircles = 0;
                 }
                 if(matchCircles === 3){
-                    message.innerText = "You won!";
                     state.gameLive = false;
-                    return true;
+                    state.winner = state.board[j][i];
+                    return;
                 }
             }
         }
@@ -157,36 +226,36 @@ diagonalRtoLWin();
         for(let i = 3; i < 6; i++){
             let matchCircles = 0;
             let up = i;
+            let y = i - 2;
             let down = 5;
-            let counter = 6;
             for(let j = 0; j < i; j++){
             if(state.board[up][j] === state.board[up - 1][j + 1]){
                 matchCircles++;
-                up--;
             } else {
                 matchCircles = 0;
             }
             if(matchCircles === 3){
-                message.innerText = "You won!";
                 state.gameLive = false;
-                return true;
+                state.winner = state.board[up][j];
+                return;
             }
+            up--;
             }
             matchCircles = 0;
-            for(j = 1; j < counter; j++){
-                if(state.board[down][j] === state.board[down - 1][j + 1]){
+            for(j = 0; j < i; j++){
+                if(state.board[down][y] === state.board[down - 1][y + 1]){
                     matchCircles++;
                 } else {
                     matchCircles = 0;
                 }
-                down--;
                 if(matchCircles === 3){
-                    message.innerText = "You won!";
                     state.gameLive = false;
-                    return true;
+                    state.winner = state.board[down][y];
+                    return;
                 }
+                down--;
+                y++;
             }
-            counter--;
         }
     }
     function diagonalRtoLWin() {
@@ -195,7 +264,6 @@ diagonalRtoLWin();
         for(let i = 0; i < 3; i++){
             let matchCircles = 0;
             let up = i;
-            let startTop = 0;
             for(let j = 0; j < runBottom; j++){
                 if(state.board[up][j] === state.board[up + 1][j + 1]){
                     matchCircles++;
@@ -203,28 +271,53 @@ diagonalRtoLWin();
                     matchCircles = 0;
                 }
                 if(matchCircles === 3){
-                    message.innerText = "You won!";
                     state.gameLive = false;
-                    return true;
+                    state.winner = state.board[up][j];
+                    return;
                 }
                 up++;
             }
             matchCircles = 0;
             runBottom--;
-            for(let j = 1; j <= runTop; j++){
-                if(state.board[startTop][j] === state.board[startTop + 1][j + 1]){
+            for(let j = 0; j < runTop; j++){
+                let y = j + 1;
+                if(state.board[j][y] === state.board[j + 1][y + 1]){
                     matchCircles++;
-                    startTop++;
                 } else {
                     matchCircles = 0;
                 }
                 if(matchCircles === 3){
-                    message.innerText = "You won!";
                     state.gameLive = false;
-                    return true;
+                    state.winner = state.board[j][y];
+                    return;
                 }
             }
-            runTop++;
+            runTop--;
         }
     }
+}
+function checkDraw() {
+    if(state.numberOfMoves > 41){
+        state.draw = true;
+        state.gameLive = false;
+    }
+}
+function renderDraw() {
+    if(state.draw){
+        message.innerText = "No more possible moves. It's a draw!";
+    }
+}
+function renderWin () {
+    if(state.winner){
+        if(state.winner === state.players[0].color) {
+        message.innerText = `Congrats ${state.players[0].name}!! Reset if you want to play again!`;
+    } else {
+        message.innerText = `Congrats ${state.players[1].name}!! Reset if you want to play again!`;
+    }
+}
+}
+function resetGame(){
+    message.innerText = 'To play a computer enter player name as "computer"';
+    buildInitialState();
+    render();
 }
