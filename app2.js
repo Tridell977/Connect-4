@@ -18,7 +18,7 @@ setInterval(function() {
     if(state.players[state.currentPlayer].name === 'computer' && state.gameLive){
         setTimeout(computerMoves, 1000);
     }
-}, 5000)
+}, 3000)
 
 
 
@@ -50,6 +50,7 @@ function chooseNames() {
     }
     let counter = state.nameCounter;
     randomNumber = Math.floor(Math.random() * 2);
+    // assigns inputs as placeholders then assigns their order
     if(counter === 0){
         state.namePlaceHolder += nameEnter.value;
         } else if(counter === 1){
@@ -66,6 +67,7 @@ function chooseNames() {
     render();
     state.nameCounter++;
 }
+// changes the value of the array by color based on which column choosen
 function colorChange(event) {
     if(!state.players[0].name){
         message.innerText = "Please Choose Player Names.";
@@ -88,13 +90,12 @@ function changeTurn(num){
         state.currentPlayer = 0;
     }
 }
+// supposed to be a compter but did not finish
 function computerMoves(){
     let x;
     if(checkMoveHorizontal()){
         x = checkMoveHorizontal();
-    } else if(checkMoveVertical()){
-        x = checkMoveVertical();
-    } else {
+    }else {
     x = Math.floor(Math.random() * 7)
     }
     dropCircle(x);
@@ -102,9 +103,9 @@ function computerMoves(){
         for(let i = 5; i > -1 ; i--){
             for(let j = 0; j < 6; j++){
                 const color = state.players[state.currentPlayer].color;
-                if(state.board[i][j] === color){
-                    if(state.board[i][j +1] === color){
-                        if(state.board[i][j + 2] === color){
+                if(state.board[i][j] === color && j < 4 && state.board[i][j + 1] === "blank"){
+                    if(state.board[i][j + 1] === color && state.board[i][j + 2] === "blank"){
+                        if(state.board[i][j + 2] === color && state.board[i][j + 3] === "blank"){
                             return j + 3;
                         }
                         return j + 2;
@@ -114,22 +115,8 @@ function computerMoves(){
     }
 }
 }
-    function checkMoveVertical() {
-        for(let i = 0; i < 6; i++){
-            for(let j = 5; j > -1; j--){
-            const color = state.players[state.currentPlayer].color;
-            if(state.board[i][j] === color){
-                if(state.board[i][j +1] === color){
-                    if(state.board[i][j + 2] === color){
-                        return j - 3;
-                    }
-                    return j - 2;
-                }
-                return j - 1;
-            } }
-        }
-    }
 }
+// drops the chip into the furthest not taken circle
 function dropCircle(column){
     for(let y = 5; y >= 0; y--){
         if (y < 0){
